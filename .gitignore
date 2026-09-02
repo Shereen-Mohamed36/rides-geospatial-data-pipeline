@@ -1,0 +1,14 @@
+# Python & Jupyter
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Data & Parquet Files
+*.parquet
+*.csv
+!data/sample_yellow_tripdata.csv
+batches/
+
+# OS Specific
+.DS_Store
+Thumbs.db
