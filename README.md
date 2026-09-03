@@ -1,4 +1,4 @@
-# 🚖 NYC Yellow Taxi Geospatial & Big Data Engineering Pipeline
+# 🚖 NYC Yellow Taxi Big Data Pipeline
 
 An enterprise-grade, scalable data engineering pipeline designed to ingest, process, and analyze **over 13 million records** large-scale urban mobility data. This project implements a **Medallion Architecture** combined with **H3 Geospatial Indexing** to efficiently process millions of Yellow Taxi trips, optimized for spatial analytics and downstream analytics/machine learning workloads.
 
