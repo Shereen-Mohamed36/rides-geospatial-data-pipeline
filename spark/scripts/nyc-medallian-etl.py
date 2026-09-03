@@ -2,7 +2,7 @@ import sys
 import math
 import h3
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, udf, to_timestamp, year, month, dayofweek, hour, expr, count, avg, round
+from pyspark.sql.functions import col, udf, to_timestamp, year, month, dayofweek, hour, expr, count, avg, round, monotonically_increasing_id
 from pyspark.sql.types import StringType, DoubleType
 from pyspark.sql.window import Window
 
@@ -55,18 +55,22 @@ def main():
     # 3. Bronze Layer - Read Batch Data
     df_bronze = spark.read.parquet(input_file_path)
 
-    # 4. Silver Layer - Preprocessing & Geohashing
+    # 4. Silver Layer - Preprocessing, Geohashing & Required Table Schema
     df_silver_prepared = df_bronze.filter(
         (col("Start_Lat") != 0) & (col("Start_Lon") != 0) &
         (col("End_Lat") != 0) & (col("End_Lon") != 0) &
         (col("Start_Lat").isNotNull()) & (col("Start_Lon").isNotNull()) &
         (col("Passenger_Count") > 0) & (col("Trip_Distance") > 0)
-    ).withColumn("pickup_datetime", to_timestamp(col("Trip_Pickup_DateTime"))) \
-     .withColumn("pickup_year", year(col("pickup_datetime"))) \
-     .withColumn("pickup_month", month(col("pickup_datetime"))) \
-     .withColumn("day_of_week", dayofweek(col("pickup_datetime"))) \
+    ).withColumn("trip_id", monotonically_increasing_id()) \
+     .withColumn("start_time", to_timestamp(col("Trip_Pickup_DateTime"))) \
+     .withColumn("end_time", to_timestamp(col("Trip_Dropoff_DateTime"))) \
+     .withColumn("trip_duration_sec", col("end_time").cast("long") - col("start_time").cast("long")) \
+     .withColumn("pickup_year", year(col("start_time"))) \
+     .withColumn("pickup_month", month(col("start_time"))) \
+     .withColumn("day_of_week", dayofweek(col("start_time"))) \
      .withColumn("is_weekend", expr("CASE WHEN day_of_week IN (1, 7) THEN 1 ELSE 0 END")) \
-     .withColumn("h3_index", lat_lng_to_h3(col("Start_Lat"), col("Start_Lon"))) \
+     .withColumn("start_geo_hash", lat_lng_to_h3(col("Start_Lat"), col("Start_Lon"))) \
+     .withColumn("end_geo_hash", lat_lng_to_h3(col("End_Lat"), col("End_Lon"))) \
      .withColumn("haversine_miles", haversine_distance(col("Start_Lat"), col("Start_Lon"), col("End_Lat"), col("End_Lon")))
 
     # Append into Silver Layer in HDFS
@@ -76,10 +80,10 @@ def main():
         .option("compression", "snappy") \
         .parquet("hdfs://localhost:9000/data/staging/rides_geo/")
 
-    # 5. Gold Layer - Spatial & Time Aggregations
-    df_gold_summary = df_silver_prepared.filter(col("h3_index").isNotNull()) \
-        .withColumn("pickup_hour", hour(col("pickup_datetime"))) \
-        .groupBy("h3_index", "pickup_hour") \
+    # 5. Gold Layer - Spatial & Time Aggregations (using start_geo_hash)
+    df_gold_summary = df_silver_prepared.filter(col("start_geo_hash").isNotNull()) \
+        .withColumn("pickup_hour", hour(col("start_time"))) \
+        .groupBy("start_geo_hash", "pickup_hour") \
         .agg(
             count("*").alias("total_trips"),
             round(avg("Fare_Amt"), 2).alias("avg_fare"),
@@ -87,7 +91,7 @@ def main():
             round(avg("haversine_miles"), 2).alias("avg_haversine_distance")
         )
 
-    window_spec = Window.partitionBy("h3_index").orderBy("pickup_hour").rowsBetween(Window.unboundedPreceding, Window.currentRow)
+    window_spec = Window.partitionBy("start_geo_hash").orderBy("pickup_hour").rowsBetween(Window.unboundedPreceding, Window.currentRow)
     df_gold_final = df_gold_summary.withColumn("running_avg_fare", round(avg("avg_fare").over(window_spec), 2))
 
     # Append into Gold Layer in HDFS
