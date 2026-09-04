@@ -16,7 +16,8 @@ The pipeline is built using modern big data tools, ensuring a strict separation 
   * `Silver Layer`: Cleaned, filtered, and spatially enriched data (Parquet format).
   * `Gold Layer`: Aggregated business-level metrics ready for BI and ML consumption.
 * **Metadata & DDLs:** Apache Hive / SQL Scripts.
-  <img width="1600" height="955" alt="image" src="https://github.com/user-attachments/assets/97673e56-ed1b-4de7-b457-1943a0a6a8e1" />
+<img width="1920" height="1080" alt="final arc" src="https://github.com/user-attachments/assets/47a468d9-e7d0-4846-b891-c3b89d88e82d" />
+
 
 
 ---
