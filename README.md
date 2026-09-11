@@ -7,6 +7,7 @@ An enterprise-grade, scalable data engineering pipeline designed to ingest, proc
 ##  Architecture & Tech Stack
 
 The pipeline is built using modern big data tools, ensuring a strict separation of concerns between batch ingestion, simulated streaming, distributed processing, and schema management.
+
 <img width="3522" height="2056" alt="finaallll" src="https://github.com/user-attachments/assets/704282e8-df49-4462-ba53-e85599fc8c46" />
 
 ---
