@@ -19,4 +19,5 @@ The processed Gold layer data was connected to Tableau to uncover spatial and fi
 * <img width="1441" height="721" alt="fare sv trip" src="https://github.com/user-attachments/assets/8ba2bee2-df83-4a8d-91f6-40861432492c" />
 
 ### Final Dashboard
+
 <img width="1497" height="676" alt="tableau dashboard" src="https://github.com/user-attachments/assets/062b9ac1-73ad-4b50-a80c-489dd3024233" />
