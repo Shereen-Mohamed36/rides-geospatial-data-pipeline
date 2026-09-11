@@ -50,6 +50,7 @@ rides-geospatial-data-pipeline/
 │   └──📂 scripts/            # Production-ready PySpark ETL (`nyc-medallian-etl.py`) and ML scripts (`nyc_taxi_ml_pipeline.py`)
 ├── 📂 nifi/                   # NiFi templates, flow definitions, and simulated streaming configurations
 ├──📂 hive/                   # Hive DDLs, table definitions, and schema management scripts
-├──📂 tableau/                # Tableau dashboards (`nyc dashboard.twb`) and visualization reports
+├──📂 tableau/                 # Tableau dashboards (`nyc dashboard.twb`)
+    └── README.md             # Key insights & visualization photos
 ├──📂 docs/                   # Architecture diagrams & documentation
 └── .gitignore              # Excludes heavy datasets, check-points, and local caches
