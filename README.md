@@ -7,21 +7,20 @@ An enterprise-grade, scalable data engineering pipeline designed to ingest, proc
 ##  Architecture & Tech Stack
 
 The pipeline is built using modern big data tools, ensuring a strict separation of concerns between batch ingestion, simulated streaming, distributed processing, and schema management.
-
-* **Orchestration & Ingestion:** Apache NiFi (Configured for **simulated streaming data flows**, mimicking real-time event streaming using historical batch files).
-* **Distributed Processing:** Apache Spark & PySpark (Handling transformations, window functions, and geospatial calculations).
-* **Geospatial Analytics:** Uber's H3 Spatial Indexing (Converting latitude/longitude coordinates into hierarchical hexagonal indexes for spatial aggregation).
-* **Data Lake Storage (Medallion Architecture):**
-  * `Bronze Layer`: Raw immutable data ingested from source.
-  * `Silver Layer`: Cleaned, filtered, and spatially enriched data (Parquet format).
-  * `Gold Layer`: Aggregated business-level metrics ready for BI and ML consumption.
-* **Metadata & DDLs:** Apache Hive / SQL Scripts.
-<img width="1920" height="1080" alt="final arc" src="https://github.com/user-attachments/assets/47a468d9-e7d0-4846-b891-c3b89d88e82d" />
-
-
+<img width="3522" height="2056" alt="finaallll" src="https://github.com/user-attachments/assets/704282e8-df49-4462-ba53-e85599fc8c46" />
 
 ---
+## Pipeline Components & Tech Stack
 
+* **Orchestration & Ingestion (Apache NiFi):** Continuously monitors incoming directories using timestamp tracking and file filters to ingest batches safely. Features built-in back pressure controls, automated Hive partition repair (`MSCK REPAIR TABLE`), and robust retry/quarantine mechanisms for handling transient cluster failures.
+* **Distributed Processing (Apache Spark & PySpark):** Handles data cleansing, validation, and incremental transformations via `nyc-medallian-etl.py`. Automatically filters out invalid coordinates, zero passenger counts, and zero-distance trips.
+* **Geospatial Analytics (Uber H3 Indexing):** Converts latitude and longitude coordinates into hierarchical hexagonal indexes at **Resolution 8** via custom Python UDFs, alongside optimized great-circle **Haversine distance** calculations.
+* **Storage Layers (Medallion Architecture):**
+  * **Bronze Layer:** Raw immutable data ingested from source batches into HDFS.
+  * **Silver Layer:** Cleaned, filtered, and spatially enriched trip-level data stored in Parquet format and partitioned by year and month.
+  * **Gold Layer:** Pre-aggregated spatial-temporal business summaries grouped by geo-hash and pickup hour to track total trips, fare revenues, and metrics.
+* **Machine Learning Pipeline (`nyc_taxi_ml_pipeline.py`):** A production-ready regression pipeline supporting Gradient-Boosted Trees (`gbt`), Random Forest (`rf`), and Linear Regression (`lr`) to predict trip durations and fare amounts using strict chronological data splitting.
+---
 ## 📊 Dataset & Source
 
 The pipeline processes real-world urban transport records sourced from the official TLC Trip Record Data repository. 
@@ -34,15 +33,11 @@ The pipeline processes real-world urban transport records sourced from the offic
 
 ```text
 rides-geospatial-data-pipeline/
-│
-├── 📁 spark/
-│   ├── 📁 notebooks/        # Exploratory Data Analysis (EDA) & prototyping notebooks
-│   └── 📁 scripts/          # Production-ready PySpark ETL and processing scripts
-│
-├── 📁 nifi/                 # NiFi templates, flow definitions, and simulated streaming configurations
-│
-├── 📁 hive/                 # Hive DDLs, table definitions, and schema management scripts
-│
-├── 📁 docs/                 # Architecture diagrams & documentation
-│
-└── 📄 .gitignore            # Excludes heavy datasets, check-points, and local caches
+├── 📂 spark/
+│   ├──📂 notebooks/          # Exploratory Data Analysis (EDA) & prototyping notebooks
+│   └──📂 scripts/            # Production-ready PySpark ETL (`nyc-medallian-etl.py`) and ML scripts (`nyc_taxi_ml_pipeline.py`)
+├── 📂 nifi/                   # NiFi templates, flow definitions, and simulated streaming configurations
+├──📂 hive/                   # Hive DDLs, table definitions, and schema management scripts
+├──📂 tableau/                # Tableau dashboards (`nyc dashboard.twb`) and visualization reports
+├──📂 docs/                   # Architecture diagrams & documentation
+└── .gitignore              # Excludes heavy datasets, check-points, and local caches
