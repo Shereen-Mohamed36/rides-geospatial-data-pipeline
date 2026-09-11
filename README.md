@@ -21,6 +21,17 @@ The pipeline is built using modern big data tools, ensuring a strict separation 
   * **Gold Layer:** Pre-aggregated spatial-temporal business summaries grouped by geo-hash and pickup hour to track total trips, fare revenues, and metrics.
 * **Machine Learning Pipeline (`nyc_taxi_ml_pipeline.py`):** A production-ready regression pipeline supporting Gradient-Boosted Trees (`gbt`), Random Forest (`rf`), and Linear Regression (`lr`) to predict trip durations and fare amounts using strict chronological data splitting.
 ---
+## 💡 Data Engineering Highlights & Optimizations
+
+As an enterprise-grade data engineering pipeline, several advanced optimizations, architectural patterns, and scaling strategies were implemented to ensure high performance, fault tolerance, and efficiency:
+
+* **Distributed Processing & Partitioning:** Utilized Apache Spark with dynamic partition pruning and optimized Snappy compression on Silver and Gold layers, drastically reducing I/O bottlenecks and query scan times in HDFS and Hive.
+* **Geospatial Optimization & UDF Efficiency:** Leveraged Uber’s H3 hexagonal hierarchical indexing (Resolution 8) to convert high-cardinality lat/long pairs into compact spatial keys, enabling fast and scalable spatial aggregations without degrading spatial resolution.
+* **Fault Tolerance & Back Pressure Control:** Configured Apache NiFi data flows with strict back pressure ceilings (capped at 200 FlowFiles) and automated `RetryFlowFile` mechanisms to gracefully manage network and cluster hiccups, routing failed states to dedicated quarantine boxes.
+* **Chronological Data Leakage Prevention:** Engineered the Spark ML pipeline to enforce strict time-ordered data splits (train, validation, test based on explicit timestamps) rather than random splitting, mimicking true production forecasting behavior.
+* **Scalable Storage Design (Medallion Architecture):** Implemented strict separation of concerns across Bronze (raw, immutable), Silver (cleaned, typed, and partitioned), and Gold (pre-aggregated business metrics) layers to support concurrent analytical workloads and Tableau dashboards efficiently.
+* **Collaborative Infrastructure & Remote Architecture:** Overcame the classic "it works on my machine" barrier by centralizing the data infrastructure, configuring static local IPs, port forwarding, and a No-IP Dynamic DNS hostname. This transformed isolated local environments into a unified, accessible shared testing ground for the entire team.
+---
 ## 📊 Dataset & Source
 
 The pipeline processes real-world urban transport records sourced from the official TLC Trip Record Data repository. 
