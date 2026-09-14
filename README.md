@@ -1,6 +1,6 @@
 # 🚖 NYC Yellow Taxi Big Data Pipeline
 
-An enterprise-grade, scalable data engineering pipeline designed to ingest, process, and analyze **over 13 million records** large-scale urban mobility data. This project implements a **Medallion Architecture** combined with **H3 Geospatial Indexing** to efficiently process millions of Yellow Taxi trips, optimized for spatial analytics and downstream analytics/machine learning workloads.
+A scalable data engineering pipeline designed to ingest, process, and analyze **over 13 million records** large-scale urban mobility data. This project implements a **Medallion Architecture** combined with **H3 Geospatial Indexing** to efficiently process millions of Yellow Taxi trips, optimized for spatial analytics and downstream analytics/machine learning workloads.
 
 ---
 
@@ -33,7 +33,7 @@ As an enterprise-grade data engineering pipeline, several advanced optimizations
 * **Scalable Storage Design (Medallion Architecture):** Implemented strict separation of concerns across Bronze (raw, immutable), Silver (cleaned, typed, and partitioned), and Gold (pre-aggregated business metrics) layers to support concurrent analytical workloads and Tableau dashboards efficiently.
 * **Collaborative Infrastructure & Remote Architecture:** Overcame the classic "it works on my machine" barrier by centralizing the data infrastructure, configuring static local IPs, port forwarding, and a No-IP Dynamic DNS hostname. This transformed isolated local environments into a unified, accessible shared testing ground for the entire team.
 ---
-## 📊 Dataset & Source
+## Dataset & Source
 
 The pipeline processes real-world urban transport records sourced from the official TLC Trip Record Data repository. 
 * **Primary Dataset Reference:** [TLC Trip Record Data - Yellow Taxi (Parquet)](https://www.kaggle.com/datasets/marcbrandner/tlc-trip-record-data-yellow-taxi?select=yellow_tripdata_2009-02.parquet)
@@ -41,7 +41,7 @@ The pipeline processes real-world urban transport records sourced from the offic
 
 ---
 
-## 📂 Repository Structure
+## Repository Structure
 
 ```text
 rides-geospatial-data-pipeline/
